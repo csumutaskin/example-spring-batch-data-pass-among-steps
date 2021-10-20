@@ -5,11 +5,12 @@ spring:
       username: sa
       password:
       generate-unique-name: false
-      ddl-auto: update
       initialization-mode: always
    batch:
       initialize-schema: always
    jpa:
+      hibernate:
+         ddl-auto: none
       database-platform: org.hibernate.dialect.PostgreSQLDialect
       defer-datasource-initialization: true  
    h2:
