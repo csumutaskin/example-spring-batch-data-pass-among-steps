@@ -1,6 +1,7 @@
 package com.csumut.batches.controller;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -28,13 +29,13 @@ public class JobRest {
 		this.sampleJob = sampleJob;
 	}
 
-	@GetMapping("/triggerJob")
+	@GetMapping("/triggerSampleJob")
 	@ResponseBody
-	public Boolean trigger() throws JobExecutionAlreadyRunningException, JobRestartException,
+	public String trigger() throws JobExecutionAlreadyRunningException, JobRestartException,
 			JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 
-		jobLauncher.run(sampleJob, new JobParametersBuilder().toJobParameters());
-		return Boolean.TRUE;
+		JobExecution run = jobLauncher.run(sampleJob, new JobParametersBuilder().toJobParameters());
+		return run.getId() + " : " + run.getExitStatus().toString();
 	}
 
 	@GetMapping("/cleanTable")

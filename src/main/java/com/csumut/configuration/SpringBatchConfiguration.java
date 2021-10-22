@@ -7,6 +7,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
@@ -54,24 +55,24 @@ public class SpringBatchConfiguration {
 
 	@Bean
 	public Job sampleJob(Step firstStep, Step secondStep, Step thirdStep) {
-		return jobBuilderFactory.get(JOB_NAME_KEY).start(firstStep).next(secondStep).next(thirdStep).build();
+		return jobBuilderFactory.get(JOB_NAME_KEY).incrementer(new RunIdIncrementer()).start(firstStep).next(secondStep).next(thirdStep).build();
 	}
 
 	@Bean
 	public Step firstStep(ExecutionContextPromotionListener promotionListener) {
-		return stepBuilderFactory.get(FIRST_STEP_NAME_KEY).tasklet(firstTasklet).listener(promotionListener).build();
+		return stepBuilderFactory.get(FIRST_STEP_NAME_KEY).allowStartIfComplete(true).tasklet(firstTasklet).listener(promotionListener).build();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Bean
 	public Step secondStep(ItemReader<HomeApplianceGroup> sampleReader, ItemProcessor sampleProcessor, ItemWriter<HomeApplianceGroup> sampleWriter) {
-		return stepBuilderFactory.get(SECOND_STEP_NAME_KEY).chunk(CHUNK_SIZE).reader(sampleReader)
+		return stepBuilderFactory.get(SECOND_STEP_NAME_KEY).allowStartIfComplete(true).chunk(CHUNK_SIZE).reader(sampleReader)
 				.processor(sampleProcessor).writer(sampleWriter).build();
 	}
 
 	@Bean
 	public Step thirdStep(Tasklet thirdTasklet) {
-		return stepBuilderFactory.get(THIRD_STEP_NAME_KEY).tasklet(thirdTasklet).build();
+		return stepBuilderFactory.get(THIRD_STEP_NAME_KEY).allowStartIfComplete(true).tasklet(thirdTasklet).build();
 	}
 	
 	@Bean
