@@ -9,6 +9,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 
+import com.csumut.batches.util.DataHolder;
+import com.csumut.batches.util.NotPromotedKeyConstants;
 import com.csumut.batches.util.PromotionListenerKeyConstants;
 import com.csumut.homeappliances.service.HomeApplianceService;
 
@@ -32,8 +34,12 @@ public class FirstTasklet implements Tasklet {
 	
 	private HomeApplianceService homeApplianceService;
 	
-	public FirstTasklet(HomeApplianceService homeApplianceService) {
+	//Spring bean (kind of stateful bean) that will hold the data from one step to another
+	private DataHolder dataHolder;
+	
+	public FirstTasklet(HomeApplianceService homeApplianceService, DataHolder dataHolder) {
 		this.homeApplianceService = homeApplianceService;
+		this.dataHolder = dataHolder;
 	}
 	
 	@Override
@@ -43,13 +49,24 @@ public class FirstTasklet implements Tasklet {
 		Long homeAppliancesCount = homeApplianceService.getHomeAppliancesCount();
 		
 		ExecutionContext stepExecutionContext = getStepExecutionContext(chunkContext);
+		ExecutionContext jobExecutionContext = getJobExecutionContext(chunkContext);
+		
 		stepExecutionContext.put(PromotionListenerKeyConstants.COUNT_OF_HOME_APPLIANCES_KEY, homeAppliancesCount);
-				
+		stepExecutionContext.put(NotPromotedKeyConstants.NOT_PROMOTED_KEY, "will be lost after the step");
+		jobExecutionContext.put(NotPromotedKeyConstants.NOT_PROMOTED_BUT_IN_JOB_EXECUTION_CONTEXT_KEY, 
+				"will be preserved since directly put to job's execution context");
+			
+		dataHolder.put(NotPromotedKeyConstants.DATA_HOLDER_SAMPLE_STR_KEY, "Always available from now on, EVEN AFTER the job ends");
 		return RepeatStatus.FINISHED;
 	}
 	
 	//Returns the current step's execution context.
 	private ExecutionContext getStepExecutionContext(ChunkContext chunkContext) {
 		return chunkContext.getStepContext().getStepExecution().getExecutionContext();
+	}	
+	
+	//Returns the current step's job's execution context.
+	private ExecutionContext getJobExecutionContext(ChunkContext chunkContext) {
+		return chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
 	}	
 }
