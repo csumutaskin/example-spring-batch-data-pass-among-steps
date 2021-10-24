@@ -14,6 +14,8 @@ import com.csumut.batches.util.PromotionListenerKeyConstants;
 
 /**
  * A sample tasklet to demonstrate how information can be passed to future steps.
+ * Here we only read the data that is stored from previous steps.
+ * Not a practical tasklet in real life.
  * 
  * @author UMUT
  *
@@ -25,10 +27,12 @@ public class ThirdTasklet implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {		
 		
-		ExecutionContext jobExecutionContext = getJobExecutionContext(chunkContext);
-		//logger.info("First Tasklet started running at : {}",  jobExecutionContext.getString(PromotionListenerKeyConstants.COUNT_OF_HOME_APPLIANCES_KEY));
-		
 		logger.info("ThirdTasklet");
+		
+		ExecutionContext jobExecutionContext = getJobExecutionContext(chunkContext);
+		logger.info("The total number of home application items can be retrieved from the JOB's execution context: {}",  
+				jobExecutionContext.getLong(PromotionListenerKeyConstants.COUNT_OF_HOME_APPLIANCES_KEY));
+				
 		return RepeatStatus.FINISHED;
 	}
 	

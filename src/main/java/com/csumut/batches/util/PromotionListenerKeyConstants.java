@@ -1,7 +1,8 @@
 package com.csumut.batches.util;
 
 /**
- * Some constant values that will be used in 
+ * Some constant values that will be needed to put and reach the values 
+ * in execution context.
  * 
  * @author UMUT
  *

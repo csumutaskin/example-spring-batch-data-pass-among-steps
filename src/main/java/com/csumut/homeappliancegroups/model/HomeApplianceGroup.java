@@ -2,13 +2,10 @@ package com.csumut.homeappliancegroups.model;
 
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
 /**
  * A sample entity that represents a home appliance group tuple.
@@ -25,24 +22,15 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "HOME_APPLIANCE_GROUP")
 public class HomeApplianceGroup {
 	
 	@Id
-	@SequenceGenerator(name="HAG_SEQ",sequenceName="HOME_APPLIANCE_GROUP_SEQ", allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="HAG_SEQ")	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name = "count", nullable = false)
 	private Long count;
-	
-	@Column(name = "category", nullable = false)
 	private String category;
-	
-	@Column(name = "total_price", nullable = false)
 	private BigDecimal totalPrice;
-	
-	@Column(name = "PERCENTAGE", nullable = false)
 	private String percentage;
 
 	public Long getId() {

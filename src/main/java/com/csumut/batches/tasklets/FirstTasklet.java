@@ -15,6 +15,12 @@ import com.csumut.homeappliances.service.HomeApplianceService;
 /**
  * A sample tasklet to demonstrate how information can be passed to future steps.
  * It passes the total number of items in Home Appliance table to the future steps.
+ * <p>
+ * ATTENTION: A WAY TO REACH A EXECUTION CONTEXT IS IMPLEMENTED HERE.
+ * From a Spring Batch item/utility (Tasklet here) one way of reaching a step or job execution context is:
+ * using the chunkContext. A chunkContext can reach the step context which encapsulates, and the job context
+ * which encapsulates the step context. 
+ * </p>
  * 
  * @author UMUT
  *
@@ -33,12 +39,12 @@ public class FirstTasklet implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {		
 		
+		logger.info("FirstTasklet");
 		Long homeAppliancesCount = homeApplianceService.getHomeAppliancesCount();
 		
 		ExecutionContext stepExecutionContext = getStepExecutionContext(chunkContext);
-		stepExecutionContext.put(PromotionListenerKeyConstants.COUNT_OF_HOME_APPLIANCES_KEY, ""+homeAppliancesCount);
-		
-		logger.info("FirstTasklet");
+		stepExecutionContext.put(PromotionListenerKeyConstants.COUNT_OF_HOME_APPLIANCES_KEY, homeAppliancesCount);
+				
 		return RepeatStatus.FINISHED;
 	}
 	

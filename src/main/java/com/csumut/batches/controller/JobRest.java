@@ -15,6 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.csumut.homeappliancegroups.service.HomeApplianceGroupService;
 
+/**
+ * This rest end point set is used to trigger the sample job again and if you want to clean the destination database table for 
+ * a clearer demonstration. 
+ * 
+ * @author UMUT
+ *
+ */
 @RestController
 @RequestMapping("/job/")
 public class JobRest {
