@@ -24,7 +24,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import com.csumut.batches.chunkprocessing.processors.SampleProcessor;
 import com.csumut.batches.chunkprocessing.readers.utils.HomeApplianceGroupRowMapper;
 import com.csumut.batches.chunkprocessing.writers.utils.HomeApplianceGroupStatementSetter;
-import com.csumut.batches.tasklets.ThirdTasklet;
 import com.csumut.batches.util.PromotionListenerKeyConstants;
 import com.csumut.homeappliancegroups.model.HomeApplianceGroup;
 
