@@ -32,7 +32,7 @@ There is an in memory h2 database which is added to the runtime scope of the pro
 There is an end point set that you can use to re-trigger the sample job that is implemented, and clean the destination table in h2 database.
 Assuming you did not change the application port (still running on 8080), you can reach:
 
-* [The H2 console @ http://localhost:8080/h2](localhost:8080/h2)
+* [The H2 console @ http://localhost:8080/h2](http://localhost:8080/h2)
 * [Trigger Sample Job URL @ http://localhost:8080/job/triggerSampleJob](http://localhost:8080/job/triggerSampleJob)
 * [Clean the tuples in destination table @ http://localhost:8080/job/cleanTable](http://localhost:8080/job/cleanTable)
 
@@ -84,6 +84,7 @@ Spring Batch framework creates a set of database tables to control job and step 
 * SHORT_CONTEXT 
 * SERIALIZED_CONTEXT
 
+<<<<<<< HEAD
 Execution context is tried to be stored in short_context first. But this column is limited to varchar(2500) and this might lead to a data loss or exception if this was the only column to store the data.
 If the serialized execution context exceeds the size of varchar(2500), then serialized_context comes on the scene. serialized_context is a much larger area to store the context. Serialized_context column is the place to store the execution context if the execution context becomes bigger.
 
