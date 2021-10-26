@@ -60,8 +60,8 @@ As stated before, one of the problems that developers confront is "passing data 
 
 Solutions that are not shown here in this project, but can still be considered as a proper implementation to pass information among steps might be:
  
-*Using a "custom structure" in a persistent store, like file or database, to store the data that will be needed among steps. After storing it in a predecessor step, it can be retrieved by reaching the same store and reading it back using a query. However it is totally the developer's concern of how the data is stored, and the maintenance cost of the storage might be an additional problem
-*Using an in memory / cache solution to store the data and read it back whenever it is necessary. Although this solution is a faster way to reach the stored data, maintenance of the cache solution might still be a problem. Design of the cache map, setting, resetting data on that map, concurrency issues can also cause additional problems.
+* Using a "custom structure" in a persistent store, like file or database, to store the data that will be needed among steps. After storing it in a predecessor step, it can be retrieved by reaching the same store and reading it back using a query. However it is totally the developer's concern of how the data is stored, and the maintenance cost of the storage might be an additional problem
+* Using an in memory / cache solution to store the data and read it back whenever it is necessary. Although this solution is a faster way to reach the stored data, maintenance of the cache solution might still be a problem. Design of the cache map, setting, resetting data on that map, concurrency issues can also cause additional problems.
 
 Along with these 2 conceptual solutions, spring batch provides more convenient ways to pass data to future steps. **Using execution context** during the job execution is the preferred way to go when someone needs to pass information between steps. Another solution might be using a data holder bean controlled by the spring context. Using a data holder bean is not a suggested spring batch solution. A stateful (kind of) bean is harder to control and not convenient as expected. Thus this implementation still exists, just to show that it can store data, however it is not a recommended way to use.
 
@@ -123,7 +123,7 @@ If the size of the serialized content is more than the shortContextLength, then 
 
 After this brief information on execution contexts, we can continue to talk about the solution:
 
-##Approach 1: Storing and reading the data from Job's Execution Context.
+## Approach 1: Storing and reading the data from Job's Execution Context.
 
 Store any key value pair in Job's Execution Context during the job execution, and directly read it from any other component of the job using the same context. On the very first tasklet based step running, you can [see](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/batches/tasklets/FirstTasklet.java) a job's ExecutionContext can be reached from the chunkContext given to the execute method of the tasklet using the code snippet:
 
@@ -139,13 +139,13 @@ Store any key value pair in Job's Execution Context during the job execution, an
  
  This solution is a practical way to store and pass information. But this solution is a more **"data coupled"** way of step implementation. When reusing this step implementation in different modules of our batch project, we might not need to put the same data since it might not be necessary to reach the stored data in future steps. So what we need might be an alternative a less coupled way of implementation.
  
-##Approach 2: Using an ExecutionContextPromotionListener to listen to and promote the data when necessary
+## Approach 2: Using an ExecutionContextPromotionListener to listen to and promote the data when necessary
 
 What is we had a way to store any data in running step's ExecutionContext and any necessary data is promoted to Job's Execution Context automatically after that Step's execution? This is the right decoupled way of the step implementation. This is possible if we define a ExecutionContextPromotionListener instance and register it as a listener to the Step that we are storing the data. A more declarative explanation is [here](https://docs.spring.io/spring-batch/docs/current/reference/html/common-patterns.html#passingDataToFutureSteps) on the official guide.
 
 What we simply do is:
 
-###Declare a promotion listener bean and put the list of the key values that will be promoted at the end of the step execution to the listener: [Here](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/configuration/SpringBatchConfiguration.java)
+### Declare a promotion listener bean and put the list of the key values that will be promoted at the end of the step execution to the listener: [Here](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/configuration/SpringBatchConfiguration.java)
 
 	@Bean
 	public ExecutionContextPromotionListener promotionListener() {
@@ -154,7 +154,7 @@ What we simply do is:
 		return listener;
 	}
 
-###Register it to a particular step: [Here](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/configuration/SpringBatchConfiguration.java)
+### Register it to a particular step: [Here](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/configuration/SpringBatchConfiguration.java)
 
 	@Bean
 	public Step firstStep(ExecutionContextPromotionListener promotionListener) {
@@ -163,17 +163,17 @@ What we simply do is:
 										.listener(promotionListener).build();
 	}
 
-###Store any key value data in **Step's** ExecutionContext: [Here](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/batches/tasklets/FirstTasklet.java)
+### Store any key value data in **Step's** ExecutionContext: [Here](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/batches/tasklets/FirstTasklet.java)
 
 	stepExecutionContext.put(PromotionListenerKeyConstants.COUNT_OF_HOME_APPLIANCES_KEY, homeAppliancesCount);
 
-###Read the same data in **Job's** ExecutionContext in future steps: [Here](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/batches/tasklets/ThirdTasklet.java)
+### Read the same data in **Job's** ExecutionContext in future steps: [Here](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/batches/tasklets/ThirdTasklet.java)
 
 	jobExecutionContext.getLong(PromotionListenerKeyConstants.COUNT_OF_HOME_APPLIANCES_KEY)
 
 > **_ATTENTION:_**	Note that no further steps can read the data from their **STEP EXECUTION CONTEXT**. They have to access the data from **JOB'S EXECUTION CONTEXT**. In addition, if the key is not listened by the promotion listener, it is not promoted to the Job's Execution Context. Thus it is already lost after the step's execution.
 
-##Approach3: Using a Data Holder Bean
+## Approach3: Using a Data Holder Bean
 
 This solution is not a good way to choose, however if you somehow need to reach the stored data after the job's execution, you might still use this solution. See [DataHolder bean](https://github.com/csumutaskin/example-spring-batch-data-pass-among-steps/blob/main/src/main/java/com/csumut/batches/util/DataHolder.java) and its usage for details. This is just a simple implementation.
 It can be modified and shaped according to the necessities.
