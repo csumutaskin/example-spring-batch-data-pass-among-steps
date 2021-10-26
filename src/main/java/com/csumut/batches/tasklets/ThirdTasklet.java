@@ -7,7 +7,10 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.stereotype.Component;
 
+import com.csumut.batches.util.DataHolder;
+import com.csumut.batches.util.NotPromotedKeyConstants;
 import com.csumut.batches.util.PromotionListenerKeyConstants;
 
 
@@ -20,9 +23,15 @@ import com.csumut.batches.util.PromotionListenerKeyConstants;
  * @author UMUT
  *
  */
+@Component
 public class ThirdTasklet implements Tasklet {	
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private DataHolder dataHolder;
+	
+	public ThirdTasklet(DataHolder dataHolder) {
+		this.dataHolder = dataHolder;
+	}
 	
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {		
@@ -32,7 +41,15 @@ public class ThirdTasklet implements Tasklet {
 		ExecutionContext jobExecutionContext = getJobExecutionContext(chunkContext);
 		logger.info("The total number of home application items can be retrieved from the JOB's execution context: {}",  
 				jobExecutionContext.getLong(PromotionListenerKeyConstants.COUNT_OF_HOME_APPLIANCES_KEY));
-				
+		
+		logger.info("A non promoted data is {} after retrieved from job's execution context", 
+				jobExecutionContext.get(NotPromotedKeyConstants.NOT_PROMOTED_KEY));	
+		
+		logger.info("A non promoted data (put direcctly to the job's execution context) is: \"{}\" after retrieved from job's execution context", 
+				jobExecutionContext.get(NotPromotedKeyConstants.NOT_PROMOTED_BUT_IN_JOB_EXECUTION_CONTEXT_KEY));	
+		
+		logger.info("Once set, the value of key: DATA_HOLDER_SAMPLE_STR is always available: {}", dataHolder.get(NotPromotedKeyConstants.DATA_HOLDER_SAMPLE_STR_KEY));
+		
 		return RepeatStatus.FINISHED;
 	}
 	

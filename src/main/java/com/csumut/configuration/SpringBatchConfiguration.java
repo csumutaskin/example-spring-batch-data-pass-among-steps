@@ -24,7 +24,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import com.csumut.batches.chunkprocessing.processors.SampleProcessor;
 import com.csumut.batches.chunkprocessing.readers.utils.HomeApplianceGroupRowMapper;
 import com.csumut.batches.chunkprocessing.writers.utils.HomeApplianceGroupStatementSetter;
-import com.csumut.batches.tasklets.ThirdTasklet;
 import com.csumut.batches.util.PromotionListenerKeyConstants;
 import com.csumut.homeappliancegroups.model.HomeApplianceGroup;
 
@@ -52,6 +51,7 @@ public class SpringBatchConfiguration {
 	private JobBuilderFactory jobBuilderFactory;
 	private StepBuilderFactory stepBuilderFactory;
 	private Tasklet firstTasklet;
+	private Tasklet thirdTasklet;
 
 	public SpringBatchConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
 		this.jobBuilderFactory = jobBuilderFactory;
@@ -88,7 +88,7 @@ public class SpringBatchConfiguration {
 	}
 
 	@Bean
-	public Step thirdStep(Tasklet thirdTasklet) {
+	public Step thirdStep() {
 		return stepBuilderFactory.get(THIRD_STEP_NAME_KEY).allowStartIfComplete(true).tasklet(thirdTasklet).build();
 	}
 
@@ -114,9 +114,9 @@ public class SpringBatchConfiguration {
 		return new SampleProcessor();
 	}
 
-	@Bean
-	public Tasklet thirdTasklet() {
-		return new ThirdTasklet();
+	@Autowired
+	public void setThirdTasklet(Tasklet thirdTasklet) {
+		this.thirdTasklet = thirdTasklet;
 	}
 
 	@Bean
