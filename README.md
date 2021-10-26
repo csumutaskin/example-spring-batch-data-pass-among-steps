@@ -32,7 +32,7 @@ There is an in memory h2 database which is added to the runtime scope of the pro
 There is an end point set that you can use to re-trigger the sample job that is implemented, and clean the destination table in h2 database.
 Assuming you did not change the application port (still running on 8080), you can reach:
 
-* [The H2 console @ http://localhost:8080/h2](localhost:8080/h2)
+* [The H2 console @ http://localhost:8080/h2](http://localhost:8080/h2)
 * [Trigger Sample Job URL @ http://localhost:8080/job/triggerSampleJob](http://localhost:8080/job/triggerSampleJob)
 * [Clean the tuples in destination table @ http://localhost:8080/job/cleanTable](http://localhost:8080/job/cleanTable)
 
